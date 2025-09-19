@@ -13,12 +13,70 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
- * Implementazione di default per la creazione delle Specification
+ * Default implementation of {@link SpecificationBuilder} that provides comprehensive
+ * JPA Criteria API query building capabilities for dynamic filtering operations.
+ *
+ * <p>This builder supports a wide range of filtering operations including equality,
+ * comparison, string matching, null checks, date operations, and collection-based
+ * filtering. It handles nested field paths using dot notation and provides
+ * case-sensitive/insensitive string operations.</p>
+ *
+ * <p><b>Supported Operations:</b></p>
+ * <ul>
+ *   <li>Basic comparisons: EQUALS, NOT_EQUALS, GREATER_THAN, LESS_THAN, etc.</li>
+ *   <li>String operations: LIKE, ILIKE, STARTS_WITH, ENDS_WITH, CONTAINS</li>
+ *   <li>Collection operations: IN, NOT_IN</li>
+ *   <li>Null checks: IS_NULL, IS_NOT_NULL</li>
+ *   <li>Range operations: BETWEEN</li>
+ *   <li>Date operations: DATE_EQUALS, DATE_BEFORE, DATE_AFTER, DATE_BETWEEN</li>
+ * </ul>
+ *
+ * <p><b>Example usage:</b></p>
+ * <pre>{@code
+ * @Autowired
+ * DefaultSpecificationBuilder<User> builder;
+ *
+ * FilterCriteria criteria = FilterCriteria.builder()
+ *     .field("profile.firstName")
+ *     .operation(FilterOperation.CONTAINS)
+ *     .value("John")
+ *     .build();
+ *
+ * Specification<User> spec = builder.build(criteria);
+ * List<User> users = userRepository.findAll(spec);
+ * }</pre>
+ *
+ * <p>The builder automatically handles type casting and provides detailed error
+ * messages when operations fail. It supports nested entity relationships through
+ * dot notation in field names (e.g., "user.profile.email").</p>
+ *
+ * @param <T> the root entity type for which specifications are built
+ * @author Fabio De Zuani
+ * @see SpecificationBuilder
+ * @see FilterCriteria
+ * @see FilterOperation
+ * @see org.springframework.data.jpa.domain.Specification
  */
 @Slf4j
 @Component
 public class DefaultSpecificationBuilder<T> implements SpecificationBuilder<T> {
 
+    /**
+     * Builds a JPA Specification from the provided filter criteria.
+     *
+     * <p>This method creates a dynamic JPA Criteria API predicate based on the
+     * specified field, operation, and value(s). It supports nested field access
+     * using dot notation and handles type conversions automatically.</p>
+     *
+     * <p>The method will apply negation to the predicate if the criteria's
+     * {@code negate} flag is set to true.</p>
+     *
+     * @param criteria the filter criteria containing field, operation, and value information
+     * @return a JPA Specification that can be used with Spring Data JPA repositories
+     * @throws SpecificationException if the field path is invalid, the operation is unsupported,
+     *                               or the value type is incompatible with the operation
+     * @throws IllegalArgumentException if criteria is null
+     */
     @Override
     public Specification<T> build(FilterCriteria criteria) {
         return (root, query, criteriaBuilder) -> {
@@ -34,11 +92,6 @@ public class DefaultSpecificationBuilder<T> implements SpecificationBuilder<T> {
                         String.format("Error building specification for field: %s", criteria.getField()), e);
             }
         };
-    }
-
-    @Override
-    public boolean supports(FilterCriteria criteria) {
-        return criteria.getOperation() != null;
     }
 
     private Path<?> getPath(Root<T> root, String field) {
