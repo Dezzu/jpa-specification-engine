@@ -26,9 +26,9 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:git://github.com/yourusername/jpa-specification-engine.git</connection>
-		<developerConnection>scm:git:ssh://github.com:yourusername/jpa-specification-engine.git</developerConnection>
-		<url>https://github.com/yourusername/jpa-specification-engine</url>
+		<connection>scm:git:git://github.com/Dezzu/jpa-specification-engine.git</connection>
+		<developerConnection>scm:git:ssh://github.com:Dezzu/jpa-specification-engine.git</developerConnection>
+		<url>https://github.com/Dezzu/jpa-specification-engine</url>
 	</scm>
 
 	<properties>
