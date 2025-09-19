@@ -30,13 +30,10 @@ jobs:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
-      - name: Verify build with all artifacts
-        run: mvn clean verify -Prelease
-
       - name: Deploy to Maven Central
         run: |
           mvn clean deploy -Prelease -Pgpg \
-            --batch-mode --no-transfer-progress --settings ../.github/settings.xml
+            --batch-mode --no-transfer-progress --settings ./.github/settings.xml
         env:
           GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
           GPG_KEY_PASSWORD: ${{ secrets.GPG_PASSPHRASE }}
